@@ -44,7 +44,7 @@ _Note: Use the [Markdown Table Generator](http://www.tablesgenerator.com/markdow
 The machines on the internal network are not exposed to the public Internet. 
 
 Only the jumpbox machine can accept connections from the Internet. Access to this machine is only allowed from the following IP addresses:
-- My IP Address
+- Admin IP Address
 
 Machines within the network can only be accessed by the jumpbox.
 - Jumpbox Public IP: 40.78.134.78
@@ -54,11 +54,11 @@ A summary of the access policies in place can be found in the table below.
 
 | Name             | Publicly Accessible | Allowed IP Addresses |
 |------------------|---------------------|----------------------|
-| RedTeamJumpbox   | Yes through SSH: 22 | My IP Address        |
-| RedTeamWeb-1     | No                  | 10.0.0.4             |
-| RedTeamWeb-2     | No                  | 10.0.0.4             |
-| RedTeamWeb-3     | No                  | 10.0.0.4             |
-| RedTeamElkserver | No                  | 10.0.0.4             |
+| RedTeamJumpbox   | Yes                 | Admin IP Address     |
+| RedTeamWeb-1     | No                  | 10.0.0.1-254         |
+| RedTeamWeb-2     | No                  | 10.0.0.1-254         |
+| RedTeamWeb-3     | No                  | 10.0.0.1-254         |
+| RedTeamElkserver | Yes                 | 52.170.63.132        |
 
 ### Elk Configuration
 
@@ -68,7 +68,7 @@ Ansible was used to automate configuration of the ELK machine. No configuration 
 The playbook implements the following tasks:
 - The docker.io file is downloaded and installed.
 - Now python3_pip is downloaded and installed. Which allows Docker to install additional modules.
-- Virtual Memory need to be increased so the ELK server has sufficient resources to run properly.
+- Virtual Memory needs to be increased so the ELK server has sufficient resources to run properly.
 - A Docker ELK container will be downloaded and launched.
 - Last step is to make sure that Docker and ELK automatically start when the machine is booted up.
 
@@ -94,9 +94,19 @@ These Beats allow us to collect the following information from each machine:
 ### Using the Playbook
 In order to use the playbook, you will need to have an Ansible control node already configured. Assuming you have such a control node provisioned: 
 
-SSH into the control node and follow the steps below:
-- Copy the install-elk.yml file to /etc/ansible/roles/install-elk.yml.
-- Update the hosts file to include 10.1.0.4 ansible_python_interpreter=/usr/bin/python3
-- Run the playbook, and navigate to http://52.170.63.132:5601/app/kibana#/home to check that the installation worked as expected.
+SSH into the control node and follow the steps below: 
 
-_As a **Bonus**, provide the specific commands the user will need to run to download the playbook, update the files, etc._
+- You will have to go-to the hosts file in /etc/ansible and add the ELK server with its IP following example below (Note that IP address could be different on your machines):
+
+[webservers]
+10.0.0.5 ansible_python_interpreter=/usr/bin/python3
+10.0.0.6 ansible_python_interpreter=/usr/bin/python3
+10.0.0.7 ansible_python_interpreter=/usr/bin/python3 
+
+[ELK]
+10.1.0.4 ansible_python_interpreter=/usr/bin/python3
+
+- Next copy the .yml playbook files to the appropriate directories on the WebVMs. (Example: /etc/filebeat/filebeat-playbook.yml)
+- Now you will have to update the beat configuration files to include the ELK server host information.
+- Next you will copy the beat configuration files to the appropriate directories on the WebVMs. (Example: /etc/metricbeat/metricbeat-playbook.yml)
+- Run the playbook, and navigate to (Example: http://52.170.63.132:5601/app/kibana#/home) to check that the installation worked as expected.
